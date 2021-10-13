@@ -38,7 +38,7 @@ func GetSgPodsNames(client *kubernetes.Clientset, sgGroupNum, nameSpace, nodeNam
 	if err != nil {
 		return nil, err
 	}
-	podsNames := make([]string, 10)
+	podsNames := make([]string, 0)
 	nodeNameToCheck := strings.Split(nodeName, "-")
 	for _, pod := range pods.Items {
 		podNameToCheck := strings.Split(pod.Name, "-")
@@ -53,7 +53,7 @@ func GetSgPodsNames(client *kubernetes.Clientset, sgGroupNum, nameSpace, nodeNam
 				}
 			}
 		} else {
-			if nodeName != "" && len(nodeNameToCheck) > 2 {
+			if nodeName != "" && len(nodeNameToCheck) == 2 {
 				if podNameToCheck[2] == nodeNameToCheck[0] && podNameToCheck[3] == nodeNameToCheck[1] {
 					podsNames = append(podsNames, pod.Name)
 				}
