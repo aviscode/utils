@@ -26,14 +26,17 @@ func Usage(mustUseFlags, examples []string) func() {
 	return func() {
 		f := flag.CommandLine
 		if len(mustUseFlags) > 0 {
+			fmt.Println("Usage:")
 			for _, useFlag := range mustUseFlags {
-				fmt.Fprintf(f.Output(), "Usage:\n  %s %s  \n", os.Args[0], useFlag)
+				fmt.Fprintf(f.Output(), "%s %s\n", os.Args[0], useFlag)
 			}
 		}
 		if len(examples) > 0 {
+			fmt.Println("Example:")
 			for _, example := range examples {
-				fmt.Fprintf(f.Output(), "Example:\n  %s", example)
+				fmt.Fprintf(f.Output(), "%s %s\n", os.Args[0], example)
 			}
+			fmt.Println()
 		}
 		fmt.Fprintf(f.Output(), "All optional flag's:\n")
 		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
