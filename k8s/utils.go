@@ -33,7 +33,7 @@ func GetServiceNameForTenant(client *kubernetes.Clientset, nameSpace, tenantDoma
 }
 
 // GetSgPodsNames This func will return a slice of all the pod names related to group or to a node or to both.
-func GetSgPodsNames(client *kubernetes.Clientset, sgGroupNum, nameSpace, nodeName, row string) ([]string, error) {
+func GetSgPodsNames(client *kubernetes.Clientset, nameSpace, sgGroupNum, nodeName, row string) ([]string, error) {
 	pods, err := client.CoreV1().Pods(nameSpace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
