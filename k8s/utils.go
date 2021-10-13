@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/anthhub/forwarder"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -29,6 +30,43 @@ func GetServiceNameForTenant(client *kubernetes.Clientset, nameSpace, tenantDoma
 		}
 	}
 	return "", errors.New("No service was find to: " + tenantDomainName)
+}
+
+// GetSgPodsNames This func will return a slice of all the pod names related to group or to a node or to both.
+func GetSgPodsNames(client *kubernetes.Clientset, sgGroupNum, nameSpace, nodeName, row string) ([]string, error) {
+	pods, err := client.CoreV1().Pods(nameSpace).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	podsNames := make([]string, 10)
+	nodeNameToCheck := strings.Split(nodeName, "-")
+	for _, pod := range pods.Items {
+		podNameToCheck := strings.Split(pod.Name, "-")
+		if sgGroupNum != "" {
+			if podNameToCheck[0] == "sg" && podNameToCheck[1] == sgGroupNum {
+				if nodeName != "" && len(nodeNameToCheck) > 2 {
+					if podNameToCheck[2] == nodeNameToCheck[0] && podNameToCheck[3] == nodeNameToCheck[1] {
+						podsNames = append(podsNames, pod.Name)
+					}
+				} else {
+					podsNames = append(podsNames, pod.Name)
+				}
+			}
+		} else {
+			if nodeName != "" && len(nodeNameToCheck) > 2 {
+				if podNameToCheck[2] == nodeNameToCheck[0] && podNameToCheck[3] == nodeNameToCheck[1] {
+					podsNames = append(podsNames, pod.Name)
+				}
+			} else {
+				podsNames = append(podsNames, pod.Name)
+			}
+		}
+	}
+	if len(podsNames) > 0 {
+		return podsNames, nil
+	} else {
+		return nil, fmt.Errorf("No pods ware found in node %s for group %s: ", nodeName, sgGroupNum)
+	}
 }
 
 // GetSecretContent this func returns the secret content of a given secret name.

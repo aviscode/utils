@@ -22,15 +22,18 @@ import (
 //  --nameSpace string        The service nameSpace (default storagepod)
 //  --quiet                   To run in quiet mode without asking for confirmation (default false)
 //  --sgPodName string        The storage pod name
-func Usage(mustUseFlags, example string) func() {
+func Usage(mustUseFlags, examples []string) func() {
 	return func() {
 		f := flag.CommandLine
-		if mustUseFlags != "" {
-			fmt.Fprintf(f.Output(), "Usage:\n  %s %s  \n", os.Args[0], mustUseFlags)
-
+		if len(mustUseFlags) > 0 {
+			for _, useFlag := range mustUseFlags {
+				fmt.Fprintf(f.Output(), "Usage:\n  %s %s  \n", os.Args[0], useFlag)
+			}
 		}
-		if example != "" {
-			fmt.Fprintf(f.Output(), "Example:\n  %s", example)
+		if len(examples) > 0 {
+			for _, example := range examples {
+				fmt.Fprintf(f.Output(), "Example:\n  %s", example)
+			}
 		}
 		fmt.Fprintf(f.Output(), "All optional flag's:\n")
 		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
