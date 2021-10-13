@@ -28,13 +28,13 @@ func Usage(mustUseFlags, examples []string) func() {
 		if len(mustUseFlags) > 0 {
 			fmt.Println("Usage:")
 			for _, useFlag := range mustUseFlags {
-				fmt.Fprintf(f.Output(), "%s %s\n", os.Args[0], useFlag)
+				fmt.Fprintf(f.Output(), "  %s %s\n", os.Args[0], useFlag)
 			}
 		}
 		if len(examples) > 0 {
 			fmt.Println("Example:")
 			for _, example := range examples {
-				fmt.Fprintf(f.Output(), "%s %s\n", os.Args[0], example)
+				fmt.Fprintf(f.Output(), "  %s %s\n", os.Args[0], example)
 			}
 			fmt.Println()
 		}
