@@ -118,8 +118,8 @@ func ConfigK8sClient(kubeconfig string) (*kubernetes.Clientset, error) {
 	}
 }
 
-// GetPodNAmeForDeployment this func will return the pod name for a given deployment name.
-func GetPodNAmeForDeployment(client *kubernetes.Clientset, nameSpace, deploymentName string) (string, error) {
+// GetPodNameForDeployment this func will return the pod name for a given deployment name.
+func GetPodNameForDeployment(client *kubernetes.Clientset, nameSpace, deploymentName string) (string, error) {
 	pods, err := client.CoreV1().Pods(nameSpace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return "", err
@@ -160,14 +160,14 @@ func getSgNameInRowFromRowFile(rowFilePath, row string) (map[string][]string, er
 func checkIfNameIsInGroupOrInNode(nameToCheck, sgGroupName, nodeName, row, rowFilePath string) (bool, error) {
 	nodeNameToCheck := strings.Split(nodeName, "-")
 	if nodeName != "" && len(nodeNameToCheck) != 2 {
-		return false, fmt.Errorf("node name=%s is invalid", nodeName)
+		return false, fmt.Errorf("node name=%s is invalid node name shuold look like host-1", nodeName)
 	}
 	sgGroupNameToCheck := strings.Split(sgGroupName, "-")
 	if sgGroupName != "" && len(sgGroupNameToCheck) != 2 {
-		return false, fmt.Errorf("sg group name=%s is invalid", sgGroupName)
+		return false, fmt.Errorf("sg group name=%s is invalid group name should look like sg-1", sgGroupName)
 	}
 	nameToCheckSplit := strings.Split(nameToCheck, "-")
-	if nameToCheck != "" && len(nameToCheckSplit) != 2 {
+	if nameToCheck != "" && len(nameToCheckSplit) < 2 {
 		return false, fmt.Errorf("name to check=%s is invalid", nameToCheck)
 	}
 
