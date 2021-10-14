@@ -128,7 +128,7 @@ func GetPodNameForDeployment(client *kubernetes.Clientset, nameSpace, deployment
 	for _, pod := range pods.Items {
 		podNameToCheck := strings.Split(pod.Name, "-")
 		if deploymentNameToCheck[0] == podNameToCheck[0] && deploymentNameToCheck[1] == podNameToCheck[1] &&
-			deploymentNameToCheck[2] == podNameToCheck[2] && deploymentNameToCheck[3] == podNameToCheck[4] {
+			deploymentNameToCheck[2] == podNameToCheck[2] && deploymentNameToCheck[3] == podNameToCheck[3] {
 			return pod.Name, nil
 		}
 	}
