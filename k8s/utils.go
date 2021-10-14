@@ -44,7 +44,7 @@ func GetSgPodsNames(client *kubernetes.Clientset, nameSpace, sgGroupName, nodeNa
 	podsNames := make([]string, 0)
 
 	for _, pod := range pods.Items {
-		found, err := checkIfNameIsInGroupOrInNode(pod.Name, sgGroupName, nodeName, row, rowFilePath)
+		found, err := CheckIfNameIsInGroupOrInNode(pod.Name, sgGroupName, nodeName, row, rowFilePath)
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +69,7 @@ func GetSgDeploymentsNames(client *kubernetes.Clientset, nameSpace, sgGroupName,
 	deploymentsNames := make([]string, 0)
 
 	for _, deployment := range deployments.Items {
-		found, err := checkIfNameIsInGroupOrInNode(deployment.Name, sgGroupName, nodeName, row, rowFilePath)
+		found, err := CheckIfNameIsInGroupOrInNode(deployment.Name, sgGroupName, nodeName, row, rowFilePath)
 		if err != nil {
 			return nil, err
 		}
@@ -157,7 +157,7 @@ func getSgNameInRowFromRowFile(rowFilePath, row string) (map[string][]string, er
 	return sgInRow, nil
 }
 
-func checkIfNameIsInGroupOrInNode(nameToCheck, sgGroupName, nodeName, row, rowFilePath string) (bool, error) {
+func CheckIfNameIsInGroupOrInNode(nameToCheck, sgGroupName, nodeName, row, rowFilePath string) (bool, error) {
 	nodeNameToCheck := strings.Split(nodeName, "-")
 	if nodeName != "" && len(nodeNameToCheck) != 2 {
 		return false, fmt.Errorf("node name=%s is invalid node name shuold look like host-1", nodeName)
@@ -167,7 +167,7 @@ func checkIfNameIsInGroupOrInNode(nameToCheck, sgGroupName, nodeName, row, rowFi
 		return false, fmt.Errorf("sg group name=%s is invalid group name should look like sg-1", sgGroupName)
 	}
 	nameToCheckSplit := strings.Split(nameToCheck, "-")
-	if nameToCheck != "" && len(nameToCheckSplit) < 2 {
+	if nameToCheck != "" && len(nameToCheckSplit) < 4 {
 		return false, fmt.Errorf("name to check=%s is invalid", nameToCheck)
 	}
 
