@@ -167,7 +167,7 @@ func CheckIfNameIsInGroupOrInNode(nameToCheck, sgGroupName, nodeName, row, rowFi
 		return false, fmt.Errorf("sg group name=%s is invalid group name should look like sg-1", sgGroupName)
 	}
 	nameToCheckSplit := strings.Split(nameToCheck, "-")
-	if nameToCheck != "" && len(nameToCheckSplit) < 4 {
+	if nameToCheck != "" && len(nameToCheckSplit) < 2 {
 		return false, fmt.Errorf("name to check=%s is invalid", nameToCheck)
 	}
 
@@ -190,13 +190,15 @@ func CheckIfNameIsInGroupOrInNode(nameToCheck, sgGroupName, nodeName, row, rowFi
 			}
 		}
 	} else if nodeName != "" {
-		if nameToCheckSplit[2] == nodeNameToCheck[0] && nameToCheckSplit[3] == nodeNameToCheck[1] {
-			if row != "" {
-				if _, found := sgNameIsRow[strings.Join([]string{nameToCheckSplit[0], nameToCheckSplit[1]}, "-")]; found {
+		if nameToCheckSplit[0] == "sg" {
+			if nameToCheckSplit[2] == nodeNameToCheck[0] && nameToCheckSplit[3] == nodeNameToCheck[1] {
+				if row != "" {
+					if _, found := sgNameIsRow[strings.Join([]string{nameToCheckSplit[0], nameToCheckSplit[1]}, "-")]; found {
+						return true, nil
+					}
+				} else {
 					return true, nil
 				}
-			} else {
-				return true, nil
 			}
 		}
 	} else {
