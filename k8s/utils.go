@@ -118,7 +118,27 @@ func ConfigK8sClient(kubeconfig string) (*kubernetes.Clientset, error) {
 	}
 }
 
+// GetPodNAmeForDeployment this func will return the pod name for a given deployment name.
+func GetPodNAmeForDeployment(client *kubernetes.Clientset, nameSpace, deploymentName string) (string, error) {
+	pods, err := client.CoreV1().Pods(nameSpace).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return "", err
+	}
+	deploymentNameToCheck := strings.Split(deploymentName, "-")
+	for _, pod := range pods.Items {
+		podNameToCheck := strings.Split(pod.Name, "-")
+		if deploymentNameToCheck[0] == podNameToCheck[0] && deploymentNameToCheck[1] == podNameToCheck[1] &&
+			deploymentNameToCheck[2] == podNameToCheck[2] && deploymentNameToCheck[3] == podNameToCheck[4] {
+			return pod.Name, nil
+		}
+	}
+	return "", errors.New("No pod was find to deployment: " + deploymentName)
+}
+
 func getSgNameInRowFromRowFile(rowFilePath, row string) (map[string][]string, error) {
+	if rowFilePath == "" {
+		return nil, errors.New("rowFilePath cannot be empty")
+	}
 	f, err := os.OpenFile(rowFilePath, os.O_RDONLY, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("open file error: %v", err)
