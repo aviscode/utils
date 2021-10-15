@@ -158,17 +158,19 @@ func getSgNameInRowFromRowFile(rowFilePath, row string) (map[string][]string, er
 }
 
 func CheckIfNameIsInGroupOrInNode(nameToCheck, sgGroupName, nodeName, row, rowFilePath string) (bool, error) {
+	if nameToCheck == "" {
+		return false, fmt.Errorf("name to checkcannot be empty")
+	}
+	nameToCheckSplit := strings.Split(nameToCheck, "-")
+
 	nodeNameToCheck := strings.Split(nodeName, "-")
 	if nodeName != "" && len(nodeNameToCheck) != 2 {
 		return false, fmt.Errorf("node name=%s is invalid node name shuold look like host-1", nodeName)
 	}
+
 	sgGroupNameToCheck := strings.Split(sgGroupName, "-")
 	if sgGroupName != "" && len(sgGroupNameToCheck) != 2 {
 		return false, fmt.Errorf("sg group name=%s is invalid group name should look like sg-1", sgGroupName)
-	}
-	nameToCheckSplit := strings.Split(nameToCheck, "-")
-	if nameToCheck != "" && len(nameToCheckSplit) < 2 {
-		return false, fmt.Errorf("name to check=%s is invalid", nameToCheck)
 	}
 
 	var sgNameIsRow map[string][]string
