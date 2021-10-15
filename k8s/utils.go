@@ -148,7 +148,6 @@ func getSgNameInRowFromRowFile(rowFilePath, row string) (map[string][]string, er
 	sgInRow := map[string][]string{}
 	for rd.Scan() {
 		line := rd.Text()
-		fmt.Println(line) // GET the line string
 		lineToCheck := strings.Split(line, " ")
 		if lineToCheck[0] == row {
 			sgInRow[(lineToCheck[1][0 : len(lineToCheck[1])-1])] = strings.Split(lineToCheck[1][0:len(lineToCheck[1])-1], "-")
