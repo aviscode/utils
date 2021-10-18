@@ -156,6 +156,12 @@ func getSgNameInRowFromRowFile(rowFilePath, row string) (map[string][]string, er
 	return sgInRow, nil
 }
 
+// CheckIfNameIsInGroupOrInNode  this func will get a pod name and it will check it the pod name is in a given group or node or a row in a node
+// nameToCheck - the given pod name to check.
+// sgGroupName - the group name to check
+// nodeName - the node name to check in.
+// row the row name to check in, when looking in a row u must give rowFilePath pram that will be the path to row list file,
+// u can use this func to just get if a pod name is in a specific node by setting the sgGroupName="" or just in specific group by setting nodeName="" and so on.
 func CheckIfNameIsInGroupOrInNode(nameToCheck, sgGroupName, nodeName, row, rowFilePath string) (bool, error) {
 	if nameToCheck == "" {
 		return false, fmt.Errorf("name to checkcannot be empty")
@@ -206,4 +212,63 @@ func CheckIfNameIsInGroupOrInNode(nameToCheck, sgGroupName, nodeName, row, rowFi
 		return false, nil
 	}
 	return false, nil
+}
+
+// DeleteSgPod will get the sg pod name, and it will delete it from k8s and a new one will be automatically deployed.
+func DeleteSgPod(client *kubernetes.Clientset, nameSpace, sgPodName string) error {
+	return client.CoreV1().Pods(nameSpace).Delete(context.TODO(), sgPodName, metav1.DeleteOptions{})
+}
+
+// DisableSgPod will get the sg pod name abd it will change the active label to disable.
+func DisableSgPod(client *kubernetes.Clientset, nameSpace, sgPodName string) error {
+	//Getting the pod
+	result, err := client.CoreV1().Pods(nameSpace).Get(context.TODO(), sgPodName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	//Changing the label to disable
+	result.Labels["active"] = "disable"
+
+	//Updating the pod
+	if _, err = client.CoreV1().Pods(nameSpace).Update(context.TODO(), result, metav1.UpdateOptions{}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// EnableSgPod will get the sg pod name, and it will change the active label to enable.
+func EnableSgPod(client *kubernetes.Clientset, nameSpace, sgPodName string) error {
+	//Getting the pod
+	result, err := client.CoreV1().Pods(nameSpace).Get(context.TODO(), sgPodName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	//Changing the label to disable
+	result.Labels["active"] = "enable"
+
+	//Updating the pod
+	if _, err = client.CoreV1().Pods(nameSpace).Update(context.TODO(), result, metav1.UpdateOptions{}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// UpdateDeploymentImage will get the deployment name and img url, and it will update the deployment image.
+func UpdateDeploymentImage(client *kubernetes.Clientset, nameSpace, deploymentName, image string) error {
+	//Getting the pod
+	deploymentToUpd, err := client.AppsV1().Deployments(nameSpace).Get(context.TODO(), deploymentName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	//changing the image to the given image.
+	deploymentToUpd.Spec.Template.Spec.Containers[0].Image = image
+
+	//Updating the pod
+	if _, err = client.AppsV1().Deployments(nameSpace).Update(context.TODO(), deploymentToUpd, metav1.UpdateOptions{}); err != nil {
+		return err
+	}
+	return nil
 }
