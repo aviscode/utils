@@ -280,8 +280,8 @@ func UpdateDeploymentImage(client *kubernetes.Clientset, nameSpace, deploymentNa
 	return nil
 }
 
-//checkPodReadiness returns if the pod is ready.
-func checkPodReadiness(client *kubernetes.Clientset, nameSpace, podName string) (bool, error) {
+// CheckPodReadiness returns if the pod is ready.
+func CheckPodReadiness(client *kubernetes.Clientset, nameSpace, podName string) (bool, error) {
 	spin, _ := spinner.SpinnerConfig("Checking Readiness pod: "+podName, fmt.Sprintf("%s is Ready", podName), fmt.Sprintf("Error: %s is getting an error pls check the pods logs", podName))
 	i := 0
 	for {
