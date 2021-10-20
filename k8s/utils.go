@@ -6,11 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/anthhub/forwarder"
+	"github.com/aviscode/utils/spinner"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"strings"
+	"time"
 )
 
 // CreatServicePortForwarder this func will create a port forwarding to a given service.
@@ -160,7 +163,7 @@ func getSgNameInRowFromRowFile(rowFilePath, row string) (map[string][]string, er
 	return sgInRow, nil
 }
 
-// CheckIfNameIsInGroupOrInNode  this func will get a pod name and it will check it the pod name is in a given group or node or a row in a node
+// CheckIfNameIsInGroupOrInNode  this func will get a pod name, and it will check it the pod name is in a given group or node or a row in a node
 // nameToCheck - the given pod name to check.
 // sgGroupName - the group name to check
 // nodeName - the node name to check in.
@@ -275,4 +278,26 @@ func UpdateDeploymentImage(client *kubernetes.Clientset, nameSpace, deploymentNa
 		return err
 	}
 	return nil
+}
+
+//checkPodReadiness returns if the pod is ready.
+func checkPodReadiness(client *kubernetes.Clientset, nameSpace, podName string) (bool, error) {
+	spin, _ := spinner.SpinnerConfig("Checking Readiness pod: "+podName, fmt.Sprintf("%s is Ready", podName), fmt.Sprintf("Error: %s is getting an error pls check the pods logs", podName))
+	i := 0
+	for {
+		spin.Start()
+		if i++; i > 40 {
+			spin.StopFail()
+			return false, nil
+		}
+		podTOCheck, err := client.CoreV1().Pods(nameSpace).Get(context.TODO(), podName, metav1.GetOptions{})
+		if err != nil {
+			return false, err
+		}
+		if podTOCheck.Status.ContainerStatuses[0].Ready && podTOCheck.Status.Phase == v1.PodRunning {
+			spin.Stop()
+			return true, nil
+		}
+		time.Sleep(time.Second * 5)
+	}
 }
